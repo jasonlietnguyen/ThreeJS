@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>example 2: fly camera</title>
+<script type="text/javascript" src="js/three.js"></script>
+<script type="text/javascript" src="js/flycontrols.js"></script>
+<script type="text/javascript">
+
+function init() {  
+  var canv = document.getElementsByTagName("canvas")[0];
+  var w = canv.clientWidth;
+  var h = canv.clientHeight;
+
+  var renderer = new THREE.WebGLRenderer({canvas:canv});
+  renderer.setSize( w, h );
+  // renderer.setClearColor( new THREE.Color(0xeeeeee), 1 );
+
+  var scene = new THREE.Scene();
+
+  var camera = new THREE.PerspectiveCamera(
+      15,     // Field of view
+      w / h,  // Aspect ratio
+      0.1,    // Near
+      100000   // Far
+  );
+  scene.add(camera);
+  
+  // Camera looks toward negative z with y up
+  camera.position.set( 5, 5, 100 );
+  
+  var control = new THREE.FlyControls(camera,canv);
+  control.dragToLook = true;
+  control.movementSpeed = 1000;
+  control.rollSpeed = 1;
+
+  var geometry = new THREE.SphereGeometry( 15, 32, 32, 0, 6.285, 0, 3.1 );
+  var material = new THREE.MeshLambertMaterial( { color:0xffffff, transparent: true, opacity: 0.4 } );
+
+  for ( var i = 0; i < 10000; i ++ ) {
+
+    var mesh = new THREE.Mesh( geometry, material );
+    mesh.position.x = ( Math.random() - 0.5 ) * 15000;
+    mesh.position.y = ( Math.random() - 0.5 ) * 15000;
+    mesh.position.z = ( Math.random() - 0.5 ) * 15000;
+    mesh.updateMatrix();
+    mesh.matrixAutoUpdate = false;
+    scene.add( mesh );
+
+  }
+
+  var light = new THREE.AmbientLight( 0xffffff );
+  light.position.set( 10, 0, 10 );
+  scene.add( light );
+  
+  var clock = new THREE.Clock();
+  
+  var animate = function() {
+    var dt = clock.getDelta();
+    control.update(dt);
+    renderer.render(scene,camera);
+    requestAnimationFrame(animate);
+  };
+
+  requestAnimationFrame(animate);
+}
+  
+window.onload = init;
+window.onresize = init;
+</script>
+</head>
+<body><canvas style="width:100%;height:95%;border:1px gray solid;"></body>
+</html>  
